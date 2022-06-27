@@ -8,7 +8,7 @@ import numpy as np
 from IPython.display import clear_output
 
 # Hyperparameters
-ALPHA = 0.1  # learning rate (0.7 to start, reduce over time)
+ALPHA = 0.01  # learning rate (0.7 to start, reduce over time)
 GAMMA = 0.1  # discount factor
 EPSILON = 0.1  # exploration rate (0.1 to start, adjust over time)
 
@@ -124,7 +124,7 @@ if __name__ == "__main__":
         epoch_history.append(epochs)
 
         # print result and save current q-table to file every 10 episodes
-        if i % 10 == 0:
+        if i % 100 == 0:
             clear_output(wait=True)
             print(
                 f"(saved) | Episode: {i} | Epochs: min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
