@@ -6,7 +6,7 @@ import flappy_bird_gym
 import numpy as np
 from IPython.display import clear_output
 
-DATA_DIVIDER = 10
+DATA_DIVIDER = 5
 
 # Hyperparameters
 ALPHA = 0.01  # learning rate
@@ -74,8 +74,8 @@ if __name__ == "__main__":
 
             # Rendering the game:
             # (remove this two lines during training)
-            # env.render()
-            # time.sleep(1 / 60)  # FPS
+            env.render()
+            time.sleep(1 / 60)  # FPS
 
         if i % 10 == 0:
             clear_output(wait=True)

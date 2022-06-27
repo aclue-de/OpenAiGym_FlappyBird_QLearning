@@ -15,7 +15,7 @@ def transform_state(state):
         (transformed_state[0], transformed_state[1]))
 
 
-DATA_DIVIDER = 10
+DATA_DIVIDER = 5
 
 if __name__ == "__main__":
     env = flappy_bird_gym.make("FlappyBird-v0")
