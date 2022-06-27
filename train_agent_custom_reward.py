@@ -8,8 +8,8 @@ import numpy as np
 from IPython.display import clear_output
 
 # Hyperparameters
-ALPHA = 0.7  # learning rate (0.7 to start, reduce over time)
-GAMMA = 0.2  # discount factor
+ALPHA = 0.1  # learning rate (0.7 to start, reduce over time)
+GAMMA = 0.1  # discount factor
 EPSILON = 0.1  # exploration rate (0.1 to start, adjust over time)
 
 
@@ -26,8 +26,8 @@ def load_data():
 def transform_state(state):
     screen_size = env._screen_size
 
-    x = (state[0] * screen_size[0]).round(0)
-    y = (state[1] * screen_size[1]).round(0)
+    x = int((state[0] * screen_size[0]).round(0))
+    y = int((state[1] * screen_size[1]).round(0))
 
     return np.array([x, y])
 
@@ -53,7 +53,7 @@ def add_or_get_state_in_q_table(state, q_table):
             q_table = np.append(
                 q_table, [[transform_state(state), q_values]], axis=0)
         # default action for new state
-        return 1, len(q_table) - 1, q_table
+        return 0, len(q_table) - 1, q_table
 
 
 def render_game(enabled=False):
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # for logging
     epoch_history = []
 
-    for i in range(1, 10001):
+    for i in range(1, 100001):
         # reset environment
         state = env.reset()
 
