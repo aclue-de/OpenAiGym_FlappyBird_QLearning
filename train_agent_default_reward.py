@@ -6,11 +6,11 @@ import flappy_bird_gym
 import numpy as np
 from IPython.display import clear_output
 
-DATA_DIVIDER = 5
+DATA_DIVIDER = 10
 
 # Hyperparameters
-ALPHA = 0.01  # learning rate
-GAMMA = 0.1  # discount factor
+ALPHA = 0.001  # learning rate
+GAMMA = 0.2  # discount factor
 EPSILON = 0.1  # exploration rate
 
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     x_values = np.arange(0, h_dist + 1, 1)
     state_permutations = list(itertools.product(x_values, y_values))
 
-    top_epochs = 0
+    epoch_history = []
 
     for i in range(1, 10001):
         state = env.reset()
@@ -49,7 +49,6 @@ if __name__ == "__main__":
         done = False
 
         while not done:
-            # action = env.action_space.sample()  # Explore action space
             if random.uniform(0, 1) < EPSILON:
                 action = env.action_space.sample()  # Explore action space
             else:
@@ -69,19 +68,19 @@ if __name__ == "__main__":
             state = next_state
             epochs += 1
 
-            if epochs > top_epochs:
-                top_epochs = epochs
-
             # Rendering the game:
             # (remove this two lines during training)
-            env.render()
-            time.sleep(1 / 60)  # FPS
+            # env.render()
+            # time.sleep(1 / 300)  # FPS
+
+        epoch_history.append(epochs)
 
         if i % 10 == 0:
             clear_output(wait=True)
             # print(f"Episode: {i}")
             print(
-                f"(saved) | Episode: {i} | Top Epochs: {top_epochs}")
+                f"(saved) | Episode: {i} | Epochs: min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
+            epoch_history = []
             np.save(f'q_table_{DATA_DIVIDER}', q_table)
 
     print("Training finished.\n")
