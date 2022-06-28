@@ -8,14 +8,17 @@ import numpy as np
 from IPython.display import clear_output
 
 # Hyperparameters
-ALPHA = 0.005  # learning rate (0.7 to start, reduce over time)
-GAMMA = 0.1  # discount factor
-EPSILON = 0.05  # exploration rate (0.1 to start, adjust over time)
+ALPHA = 0.5  # learning rate
+GAMMA = 0.5  # discount factor
+EPSILON = 0  # exploration rate
+
+EPISODES = 2001  # how many attempts for the agent
 
 
+# load existing q-table from file or create a new one
 def load_data():
     try:
-        q_table = np.load(f"q_table_custom.npy")
+        q_table = np.load(f"q_table.npy")
         print("q_table loaded")
     except FileNotFoundError:
         q_table = np.array([])
@@ -23,13 +26,14 @@ def load_data():
     return q_table
 
 
+# transform the states to match pixel values of the game
 def transform_state(state):
     screen_size = env._screen_size
 
-    x = int((state[0] * screen_size[0]).round(0))
-    y = int((state[1] * screen_size[1]).round(0))
+    x = (state[0] * screen_size[0])
+    y = (state[1] * screen_size[1])
 
-    return np.array([x, y])
+    return np.around(np.array([x, y]), decimals=0)
 
 
 def get_state_index(state, q_table):
@@ -40,11 +44,11 @@ def get_state_index(state, q_table):
     return np.where(np.all(q_table[:, 0] == transformed_state, axis=1))
 
 
-def add_or_get_state_in_q_table(state, q_table):
+def get_state_action_in_q_table(state, q_table):
     state_index = get_state_index(state, q_table)
 
     if state_index is not None and len(q_table[state_index]) > 0:
-        return np.argmax(q_table[state_index, 1]), state_index, q_table
+        return q_table[state_index, 1][0, 0], state_index, q_table
     else:
         q_values = [0, 0]
         if len(q_table) == 0:
@@ -53,13 +57,13 @@ def add_or_get_state_in_q_table(state, q_table):
             q_table = np.append(
                 q_table, [[transform_state(state), q_values]], axis=0)
         # default action for new state
-        return 0, len(q_table) - 1, q_table
+        return q_values, len(q_table) - 1, q_table
 
 
 def render_game(enabled=False):
     if enabled:
         env.render()
-        time.sleep(1 / 60)  # FPS
+        time.sleep(1 / 120)  # FPS
 
 
 if __name__ == "__main__":
@@ -72,7 +76,7 @@ if __name__ == "__main__":
     # for logging
     epoch_history = []
 
-    for i in range(1, 100001):
+    for i in range(1, EPISODES):
         # reset environment
         state = env.reset()
 
@@ -83,11 +87,13 @@ if __name__ == "__main__":
         while not done:
 
             # Exploit learned values
-            action, state_index, q_table = add_or_get_state_in_q_table(
+            actions, state_index, q_table = get_state_action_in_q_table(
                 state, q_table)
             # Explore action space
             if random.uniform(0, 1) < EPSILON:
                 action = env.action_space.sample()
+            else:
+                action = np.argmax(actions)
 
             # perform chosen action
             next_state, _, done, info = env.step(
@@ -96,20 +102,19 @@ if __name__ == "__main__":
             # calculate custom reward
             reward = 0
             if done:
-                reward = -1000
+                reward = -10
 
             # get old value in q-table
-            old_value = float(q_table[state_index, 1, action])
+            old_value = actions[action]
 
             # determine best action for next state
-            next_state_index = get_state_index(next_state, q_table)
-            next_state_actions = q_table[next_state_index]
-            next_max = np.max(
-                next_state_actions[:, 1]) if len(next_state_actions) > 0 else 0
+            next_actions, _, q_table = get_state_action_in_q_table(
+                next_state, q_table)
+            next_max = np.max(next_actions)
 
             # calculate q-function
-            new_value = float((1 - ALPHA) * old_value + ALPHA *
-                              (reward + GAMMA * next_max))
+            new_value = (1 - ALPHA) * old_value + ALPHA * \
+                (reward + GAMMA * next_max)
             # update q-table
             q_table[state_index, 1, action] = new_value
 
@@ -127,8 +132,8 @@ if __name__ == "__main__":
         if i % 100 == 0:
             clear_output(wait=True)
             print(
-                f"(saved) | Episode: {i} | Epochs: min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
+                f"(saved) | Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
             epoch_history = []
-            np.save(f'q_table_custom', q_table)
+            np.save(f'q_table', q_table)
 
     print("Training finished.\n")

@@ -8,3 +8,4 @@ q_table = np.load("q_table_custom.npy")
 #         print(actions)
 print(
     f"shape: {q_table.shape} | min: {np.min(q_table)} | mean: {np.mean(q_table)} | max: {np.max(q_table)}")
+# print(q_table[1000:1010])
