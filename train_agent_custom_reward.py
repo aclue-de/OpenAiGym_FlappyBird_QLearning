@@ -8,9 +8,9 @@ import numpy as np
 from IPython.display import clear_output
 
 # Hyperparameters
-ALPHA = 0.01  # learning rate (0.7 to start, reduce over time)
+ALPHA = 0.005  # learning rate (0.7 to start, reduce over time)
 GAMMA = 0.1  # discount factor
-EPSILON = 0.1  # exploration rate (0.1 to start, adjust over time)
+EPSILON = 0.05  # exploration rate (0.1 to start, adjust over time)
 
 
 def load_data():
