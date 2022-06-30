@@ -1,26 +1,32 @@
-from contextlib import nullcontext
 import itertools
 import random
 import time
+from ast import literal_eval
+from contextlib import nullcontext
+from datetime import datetime
 
 import flappy_bird_gym
 import numpy as np
 from IPython.display import clear_output
-
-from pandas import concat, DataFrame, read_csv
+from pandas import DataFrame, concat, read_csv
 
 # Hyperparameters
 ALPHA = 0.7  # learning rate
 GAMMA = 0.5  # discount factor
 EPSILON = 0  # exploration rate
 
-EPISODES = 2001  # how many attempts for the agent
+TRAIN_AGENT = True  # toggle updating of rewards and new states
+RENDER_GAME = False  # should be disabled in training
+
+EPISODES = 1000001  # how many attempts for the agent
+DATA_REDUCTION = 10  # how much the state values are divided by
 
 
 # load existing q-table from file or create a new one
 def load_data():
     try:
-        q_table = read_csv("q_table.csv")
+        q_table = read_csv("q_table.csv", delimiter=",", converters={
+                           "actions": lambda x: literal_eval(x)})
         print("q_table loaded")
     except FileNotFoundError:
         q_table = DataFrame({
@@ -35,8 +41,8 @@ def load_data():
 def transform_state(state):
     screen_size = env._screen_size
 
-    x = (state[0] * screen_size[0])
-    y = (state[1] * screen_size[1])
+    x = (state[0] * screen_size[0] / DATA_REDUCTION)
+    y = (state[1] * screen_size[1] / DATA_REDUCTION)
 
     return list(np.around([x, y], decimals=0))
 
@@ -45,29 +51,23 @@ def transform_state(state):
 def add_state_to_history(state, state_history):
     transformed_state = transform_state(state)
 
-    if len(state_history) == 0:
-        return [transformed_state]
-
     new_history = state_history + [transformed_state]
     return new_history[-4:]
 
 
 def get_state_index(state_history, q_table):
-    if len(q_table) < 0:
-        return None
-
     state_index = q_table.index[q_table["state_history"].apply(
-        lambda s: s == state_history)]
+        lambda s: str(s) == str(state_history))]
     return state_index[0] if len(state_index) > 0 else None
 
 
 def get_state_action_in_q_table(state_history, q_table):
     state_index = get_state_index(state_history, q_table)
 
-    if state_index is not None:
+    if state_index != None:
         return q_table.at[state_index, "actions"], state_index, q_table
     else:
-        q_values = [0, 0]
+        q_values = [0.0, 0.0]
         new_entry = DataFrame({
             "state_history": [
                 state_history
@@ -86,7 +86,7 @@ def get_state_action_in_q_table(state_history, q_table):
 def render_game(enabled=False):
     if enabled:
         env.render()
-        time.sleep(1 / 120)  # FPS
+        time.sleep(1 / 60)  # FPS
 
 
 if __name__ == "__main__":
@@ -129,43 +129,44 @@ if __name__ == "__main__":
             next_state, _, done, info = env.step(
                 action)
 
-            next_state_outlook = add_state_to_history(
-                next_state, state_history)
+            if TRAIN_AGENT:
+                next_state_outlook = add_state_to_history(
+                    next_state, state_history)
 
-            # calculate custom reward
-            if done:
-                reward = -100
+                # calculate custom reward
+                if done:
+                    reward = -100
 
-            # get old value in q-table
-            old_value = actions[action]
+                # get old value in q-table
+                old_value = actions[action]
 
-            # determine best action for next state
-            next_actions, _, q_table = get_state_action_in_q_table(
-                next_state_outlook, q_table)
-            next_max = np.max(next_actions)
+                # determine best action for next state
+                next_actions, _, q_table = get_state_action_in_q_table(
+                    next_state_outlook, q_table)
+                next_max = np.max(next_actions)
 
-            # calculate q-function
-            new_value = (1 - ALPHA) * old_value + ALPHA * \
-                (reward + GAMMA * next_max)
-            # update q-table
-            q_table.at[state_index, "actions"][action] = new_value
+                # calculate q-function
+                new_value = (1 - ALPHA) * old_value + ALPHA * \
+                    (reward + GAMMA * next_max)
+                # update q-table
+                q_table.at[state_index, "actions"][action] = new_value
 
             # advance state for next loop
             state = next_state
             epochs += 1
 
-            # Render the game (should be disabled in training)
-            render_game(False)
+            render_game(RENDER_GAME)
 
         # for logging
         epoch_history.append(epochs)
 
+        q_table.to_csv("q_table.csv", index=False)
+
         # print result and save current q-table to file every 10 episodes
-        if i % 100 == 0:
+        if i % 10 == 0:
             clear_output(wait=True)
             print(
-                f"(saved) | Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
+                f"({datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}) Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
             epoch_history = []
-            q_table.to_csv("q_table.csv")
 
     print("Training finished.\n")

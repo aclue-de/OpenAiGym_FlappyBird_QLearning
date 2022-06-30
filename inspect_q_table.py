@@ -1,11 +1,16 @@
-from pprint import pprint
-
 import numpy as np
+from ast import literal_eval
+from pandas import read_csv
 
-q_table = np.load("q_table_custom.npy")
-# for actions in q_table:
-#     if actions[0] is not 0.0 and actions[1] is not 0.0:
-#         print(actions)
+q_table = read_csv("q_table.csv", names=["state_history", "actions"])
+# state_index = q_table.index[q_table["state_history"].apply(
+#     lambda x: x == print(x.split(",")))]
+state_index = q_table.index[q_table["state_history"].apply(
+    lambda x: str(x) == str([[44.0, -9.0], [43.0, -9.0], [43.0, -9.0], [42.0, -10.0]]))]
+
 print(
-    f"shape: {q_table.shape} | min: {np.min(q_table)} | mean: {np.mean(q_table)} | max: {np.max(q_table)}")
-# print(q_table[1000:1010])
+    f"shape: {q_table.shape}")
+print("state_index", state_index)
+str = "[0.1, 0.2]"
+print(type(str))
+print(literal_eval(str)[0])
