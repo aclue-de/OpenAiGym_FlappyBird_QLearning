@@ -13,7 +13,7 @@ EPISODES = 10001  # how many attempts for the agent
 # load existing q-table from file or create a new one
 def load_data():
     try:
-        q_table = np.load(f"q_table_custom.npy")
+        q_table = np.load(f"q_table.npy")
         print("q_table loaded")
     except FileNotFoundError:
         q_table = np.array([])
@@ -58,7 +58,7 @@ def get_state_action_in_q_table(state, q_table):
 def render_game(enabled=False):
     if enabled:
         env.render()
-        time.sleep(1 / 60)  # FPS
+        time.sleep(1 / 30)  # FPS
 
 
 if __name__ == "__main__":
