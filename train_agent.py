@@ -19,6 +19,7 @@ TRAIN_AGENT = True  # toggle updating of rewards and new states
 RENDER_GAME = False  # should be disabled in training
 
 EPISODES = 1000001  # how many attempts for the agent
+LIMIT_EPOCHS = 250  # increase training on earlier steps, set to None for unlimited training
 DATA_REDUCTION = 10  # how much the state values are divided by
 
 
@@ -37,7 +38,14 @@ def load_data():
     return q_table
 
 
+def init_state_history():
+    initial_state = [None, None]
+    return [initial_state, initial_state,
+            initial_state, initial_state]
+
 # transform the states to match pixel values of the game
+
+
 def transform_state(state):
     screen_size = env._screen_size
 
@@ -86,7 +94,7 @@ def get_state_action_in_q_table(state_history, q_table):
 def render_game(enabled=False):
     if enabled:
         env.render()
-        time.sleep(1 / 60)  # FPS
+        time.sleep(1 / 30)  # FPS
 
 
 if __name__ == "__main__":
@@ -104,15 +112,12 @@ if __name__ == "__main__":
         state = env.reset()
 
         # history of latest states for velocity information
-        initial_state = [None, None]
-        state_history = [initial_state, initial_state,
-                         initial_state, initial_state]
+        state_history = init_state_history()
 
-        state_index = None
         epochs, reward, = 0, 0
         done = False
 
-        while not done:
+        while not done or not (epochs == None or epochs <= LIMIT_EPOCHS):
             # add states for each episode
             state_history = add_state_to_history(state, state_history)
 
@@ -163,7 +168,7 @@ if __name__ == "__main__":
         q_table.to_csv("q_table.csv", index=False)
 
         # print result and save current q-table to file every 10 episodes
-        if i % 10 == 0:
+        if i % 5 == 0:
             clear_output(wait=True)
             print(
                 f"({datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}) Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
