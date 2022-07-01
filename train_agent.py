@@ -19,7 +19,8 @@ TRAIN_AGENT = True  # toggle updating of rewards and new states
 RENDER_GAME = False  # should be disabled in training
 
 EPISODES = 1000001  # how many attempts for the agent
-LIMIT_EPOCHS = 250  # increase training on earlier steps, set to None for unlimited training
+EPISODE_REPORT = 10  # after how many episodes you receive performance infos
+LIMIT_EPOCHS = None  # increase training on earlier steps (None for unlimited)
 DATA_REDUCTION = 10  # how much the state values are divided by
 
 
@@ -117,7 +118,7 @@ if __name__ == "__main__":
         epochs, reward, = 0, 0
         done = False
 
-        while not done or not (epochs == None or epochs <= LIMIT_EPOCHS):
+        while not done:
             # add states for each episode
             state_history = add_state_to_history(state, state_history)
 
@@ -135,25 +136,26 @@ if __name__ == "__main__":
                 action)
 
             if TRAIN_AGENT:
-                next_state_outlook = add_state_to_history(
+                future_state_outlook = add_state_to_history(
                     next_state, state_history)
 
-                # calculate custom reward
+                # calculate reward
                 if done:
                     reward = -100
 
-                # get old value in q-table
-                old_value = actions[action]
+                # get current value in q-table
+                current_value = actions[action]
 
-                # determine best action for next state
+                # determine future value estimate
                 next_actions, _, q_table = get_state_action_in_q_table(
-                    next_state_outlook, q_table)
-                next_max = np.max(next_actions)
+                    future_state_outlook, q_table)
+                future_value_extimate = np.max(next_actions)
 
                 # calculate q-function
-                new_value = (1 - ALPHA) * old_value + ALPHA * \
-                    (reward + GAMMA * next_max)
-                # update q-table
+                new_value = (1 - ALPHA) * current_value + ALPHA * \
+                    (reward + GAMMA * future_value_extimate)
+
+                # update value for chosen action in q-table
                 q_table.at[state_index, "actions"][action] = new_value
 
             # advance state for next loop
@@ -162,13 +164,16 @@ if __name__ == "__main__":
 
             render_game(RENDER_GAME)
 
+            if (LIMIT_EPOCHS != None and epochs >= LIMIT_EPOCHS):
+                break
+
         # for logging
         epoch_history.append(epochs)
 
         q_table.to_csv("q_table.csv", index=False)
 
         # print result and save current q-table to file every 10 episodes
-        if i % 5 == 0:
+        if i % EPISODE_REPORT == 0:
             clear_output(wait=True)
             print(
                 f"({datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}) Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
