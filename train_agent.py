@@ -132,14 +132,14 @@ if __name__ == "__main__":
                 action = np.argmax(actions)
 
             # perform chosen action
-            next_state, _, done, info = env.step(
+            next_state, reward, done, info = env.step(
                 action)
 
             if TRAIN_AGENT:
                 future_state_outlook = add_state_to_history(
                     next_state, state_history)
 
-                # calculate reward
+                # penalty for crashing
                 if done:
                     reward = -100
 
