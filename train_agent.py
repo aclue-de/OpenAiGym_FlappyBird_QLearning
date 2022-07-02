@@ -21,7 +21,7 @@ RENDER_GAME = False  # should be disabled in training
 EPISODES = 1000001  # how many attempts for the agent
 EPISODE_REPORT = 10  # after how many episodes you receive performance infos
 LIMIT_EPOCHS = None  # increase training on earlier steps (None for unlimited)
-DATA_REDUCTION = 10  # how much the state values are divided by
+DATA_REDUCTION = 8  # how much the state values are divided by
 
 
 # load existing q-table from file or create a new one
@@ -132,7 +132,7 @@ if __name__ == "__main__":
                 action = np.argmax(actions)
 
             # perform chosen action
-            next_state, reward, done, info = env.step(
+            next_state, _, done, info = env.step(
                 action)
 
             if TRAIN_AGENT:
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         if i % EPISODE_REPORT == 0:
             clear_output(wait=True)
             print(
-                f"({datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}) Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
+                f"({datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}) States: {len(q_table)} | Episode: {i} | Epochs - min: {min(epoch_history)}, avg: {sum(epoch_history) / len(epoch_history)}, max: {max(epoch_history)}")
             epoch_history = []
 
     print("Training finished.\n")
