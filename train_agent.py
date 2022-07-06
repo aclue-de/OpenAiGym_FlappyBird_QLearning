@@ -39,14 +39,14 @@ def load_data():
     return q_table
 
 
+# initialze the state history with None values
 def init_state_history():
     initial_state = [None, None]
     return [initial_state, initial_state,
             initial_state, initial_state]
 
+
 # transform the states to match pixel values of the game
-
-
 def transform_state(state):
     screen_size = env._screen_size
 
@@ -64,12 +64,14 @@ def add_state_to_history(state, state_history):
     return new_history[-4:]
 
 
+# find a state in the q table and return it's index
 def get_state_index(state_history, q_table):
     state_index = q_table.index[q_table["state_history"].apply(
         lambda s: str(s) == str(state_history))]
     return state_index[0] if len(state_index) > 0 else None
 
 
+# find a state in the q table and add it if it didn't exist yet
 def get_state_action_in_q_table(state_history, q_table):
     state_index = get_state_index(state_history, q_table)
 
@@ -87,11 +89,10 @@ def get_state_action_in_q_table(state_history, q_table):
         })
 
         q_table = concat([q_table, new_entry], ignore_index=True)
-
-        # default action for new state
         return q_values, len(q_table) - 1, q_table
 
 
+# optionally render the game
 def render_game(enabled=False):
     if enabled:
         env.render()
@@ -115,6 +116,7 @@ if __name__ == "__main__":
         # history of latest states for velocity information
         state_history = init_state_history()
 
+        # initialize training values
         epochs, reward, = 0, 0
         done = False
 
@@ -136,6 +138,7 @@ if __name__ == "__main__":
                 action)
 
             if TRAIN_AGENT:
+                # get potential rewards for next state
                 future_state_outlook = add_state_to_history(
                     next_state, state_history)
 
