@@ -1,6 +1,14 @@
-Create a virtual env for the project: `python -m venv .venv`
-To use the virtual env, execute: `.\.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux) as well as `deactivate` (both) to stop
+# Setup
+- this project uses python 3.9
+- create a virtual env for the project: `python -m venv .venv`
+- to use the virtual env, execute: `.\.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux) as well as `deactivate` (both) to stop
+- install dependencies: `pip install -r .\requirements.txt`
+- run `python train_agent.py` to train your agent
 
-Install dependencies: `pip install -r .\requirements.txt`
+# Evaluate a trained agent
+- switch `TRAIN_AGENT` to `False` and `RENDER_GAME` to `True`
+- run `python train_agent.py`
 
-Test the game: `flappy_bird_gym`
+## note to Windows users
+- OpenAI Gym doesn't fully support graphical interfaces for Windows
+- Follow [this tutorial](https://research.wmz.ninja/articles/2017/11/setting-up-wsl-with-graphics-and-audio.html) if you have issues with opening a game window
