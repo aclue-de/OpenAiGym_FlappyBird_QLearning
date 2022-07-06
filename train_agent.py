@@ -15,8 +15,8 @@ ALPHA = 0.7  # learning rate
 GAMMA = 0.5  # discount factor
 EPSILON = 0  # exploration rate
 
-TRAIN_AGENT = True  # toggle updating of rewards and new states
-RENDER_GAME = False  # should be disabled in training
+TRAIN_AGENT = False  # toggle updating of rewards and new states
+RENDER_GAME = True  # should be disabled in training
 
 EPISODES = 1000001  # how many attempts for the agent
 EPISODE_REPORT = 10  # after how many episodes you receive performance infos
@@ -96,7 +96,7 @@ def get_state_action_in_q_table(state_history, q_table):
 def render_game(enabled=False):
     if enabled:
         env.render()
-        time.sleep(1 / 30)  # FPS
+        time.sleep(1 / 45)  # FPS
 
 
 if __name__ == "__main__":
