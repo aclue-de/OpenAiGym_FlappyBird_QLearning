@@ -6,7 +6,7 @@
 - run `python train_agent.py` to train your agent
 
 # Evaluate a trained agent
-- switch `TRAIN_AGENT` to `False` and `RENDER_GAME` to `True`
+- in `train_agent.py`: switch `TRAIN_AGENT` to `False` and `RENDER_GAME` to `True`
 - run `python train_agent.py`
 
 ## note to Windows users
