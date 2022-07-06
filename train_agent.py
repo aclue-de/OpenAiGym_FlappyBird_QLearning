@@ -1,8 +1,6 @@
-import itertools
 import random
 import time
 from ast import literal_eval
-from contextlib import nullcontext
 from datetime import datetime
 
 import flappy_bird_gym
