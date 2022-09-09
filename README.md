@@ -12,3 +12,8 @@
 ## note to Windows users
 - OpenAI Gym doesn't fully support graphical interfaces for Windows
 - Follow [this tutorial](https://research.wmz.ninja/articles/2017/11/setting-up-wsl-with-graphics-and-audio.html) if you have issues with opening a game window
+
+### for repeated startup
+- start pulseaudio under Windows
+- start XLaunch under Windows
+- execute `export DISPLAY=:0.0` and `export PULSE_SERVER=tcp:localhost` under Linux
