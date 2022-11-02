@@ -2,7 +2,7 @@
 - this project uses python 3.9
 - create a virtual env for the project: `python -m venv .venv`
 - to use the virtual env, execute: `.\.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux) as well as `deactivate` (both) to stop
-- install dependencies: `pip install -r .\requirements.txt`
+- install dependencies: `pip install -r requirements.txt`
 - run `python train_agent.py` to train your agent
 
 # Evaluate a trained agent
