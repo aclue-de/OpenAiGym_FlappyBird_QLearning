@@ -17,3 +17,12 @@
 - start pulseaudio under Windows
 - start XLaunch under Windows
 - execute `export DISPLAY=:0.0` and `export PULSE_SERVER=tcp:localhost` under Linux
+
+## note to Mac (M1) users
+You need to install the local version of the `flappy-bird-gym` library, because of version incompabilities.
+
+1. `pip install --upgrade pip`
+2. `cd flappy-bird-gym`
+3. `pip install .`
+
+After that install the remaining requirements with `pip install autopep8 IPython pandas`.

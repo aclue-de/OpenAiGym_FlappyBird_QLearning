@@ -46,7 +46,7 @@ def init_state_history():
 
 # transform the states to match pixel values of the game
 def transform_state(state):
-    screen_size = env._screen_size
+    screen_size = [288, 512]
 
     x = (state[0] * screen_size[0] / DATA_REDUCTION)
     y = (state[1] * screen_size[1] / DATA_REDUCTION)

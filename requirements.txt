@@ -1,5 +1,5 @@
-autopep8
-flappy-bird-gym
+autopep8 == 1.6.0
+flappy-bird-gym == 0.3.0
 gym
-IPython
+IPython == 8.4.0
 pandas
