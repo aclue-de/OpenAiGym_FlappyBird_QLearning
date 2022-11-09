@@ -1,0 +1,2 @@
+[console_scripts]
+flappy_bird_gym = flappy_bird_gym.cli:main
