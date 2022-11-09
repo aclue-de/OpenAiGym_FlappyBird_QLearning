@@ -171,7 +171,8 @@ if __name__ == "__main__":
         # for logging
         epoch_history.append(epochs)
 
-        q_table.to_csv("q_table.csv", index=False)
+        if TRAIN_AGENT:
+            q_table.to_csv("q_table.csv", index=False)
 
         # print result and save current q-table to file every 10 episodes
         if i % EPISODE_REPORT == 0:
